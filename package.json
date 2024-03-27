@@ -1,0 +1,11 @@
+{
+  "name": "mecorad",
+  "version": "1.0.0",
+  "description": "telegram client",
+  "main": "telegram-client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
