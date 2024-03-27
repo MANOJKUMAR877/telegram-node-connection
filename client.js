@@ -1,9 +1,9 @@
 const net = require("net");
+const readline = require("readline");
 
-// Function to construct a telegram message according to the specified format
-function constructTelegram(distance, magnitude, phase, temperature) {
-  // Convert components to Buffer objects
-  const identifier = Buffer.from("MCR");
+// Function to create a telegram message
+function createTelegram(distance, magnitude, phase, temperature) {
+  const identifier = Buffer.from("MCR", "utf-8");
   const distanceBuffer = Buffer.alloc(8);
   distanceBuffer.writeBigInt64BE(BigInt(distance), 0);
   const magnitudeBuffer = Buffer.alloc(4);
@@ -13,50 +13,57 @@ function constructTelegram(distance, magnitude, phase, temperature) {
   const temperatureBuffer = Buffer.alloc(4);
   temperatureBuffer.writeInt32LE(temperature, 0);
 
-  // Concatenate buffers to construct the telegram message
-  const telegramMessage = Buffer.concat([
+  // Concatenate all buffers
+  const telegram = Buffer.concat([
     identifier,
     distanceBuffer,
     magnitudeBuffer,
     phaseBuffer,
     temperatureBuffer,
   ]);
-
-  return telegramMessage;
+  return telegram;
 }
 
-// Create a TCP socket and connect to the server
-const client = net.createConnection({ host: "0.0.0.0", port: 12345 }, () => {
-  console.log("Connected to server");
-  sendData(); // Send data immediately after connection
-  setInterval(sendData, 5000); // Send data every 5 seconds
+// Create readline interface
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
 });
 
-// Function to send telegram message to the server
-function sendData() {
-  // Construct the telegram message
-  const distance = 12345678901234; // Example distance in millimeters
-  const magnitude = 987654321; // Example magnitude
-  const phase = 127; // Example phase
-  const temperature = 25; // Example temperature in Celsius
+// Prompt user for input
+rl.question("Enter distance (in millimeters): ", (distance) => {
+  rl.question("Enter magnitude (unsigned integer): ", (magnitude) => {
+    rl.question("Enter phase (integer): ", (phase) => {
+      rl.question("Enter temperature (in Celsius): ", (temperature) => {
+        // Create the telegram message with user input
+        const telegramMessage = createTelegram(
+          parseInt(distance),
+          parseInt(magnitude),
+          parseInt(phase),
+          parseInt(temperature)
+        );
 
-  const telegramMessage = constructTelegram(
-    distance,
-    magnitude,
-    phase,
-    temperature
-  );
+        // Connect to the server and send the telegram message
+        const client = net.createConnection(
+          { port: 12345, host: "127.0.0.1" },
+          () => {
+            console.log("Connected to server!");
+            client.write(telegramMessage);
+            rl.close(); // Close the readline interface
+          }
+        );
 
-  // Send the telegram message to the server
-  client.write(telegramMessage);
-}
+        // Handle errors
+        client.on("error", (err) => {
+          console.error("Error:", err);
+          rl.close(); // Close the readline interface
+        });
 
-// Handle errors
-client.on("error", (err) => {
-  console.error("Error:", err);
-});
-
-// Handle connection close
-client.on("close", () => {
-  console.log("Connection closed");
+        // Handle closure
+        client.on("close", () => {
+          console.log("Connection closed");
+        });
+      });
+    });
+  });
 });
