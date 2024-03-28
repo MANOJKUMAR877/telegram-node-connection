@@ -8,7 +8,7 @@ Step 4: Initialize a new npm project (if the project doesn't already have a pack
 Follow the prompts to create the package.json file.
 
 Step 5: Start the server: node server.js
-Ensure that the server is running without any errors. If there are any errors, resolve them before proceeding.
+Ensure that the server is running without any errors.
 
 Step 6: Open another terminal window or tab.
 
