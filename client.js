@@ -25,16 +25,16 @@ function createTelegram(distance, magnitude, phase, temperature) {
 }
 
 // Create readline interface
-const rl = readline.createInterface({
+const readUserValue = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
 // Prompt user for input
-rl.question("Enter distance (in millimeters): ", (distance) => {
-  rl.question("Enter magnitude (unsigned integer): ", (magnitude) => {
-    rl.question("Enter phase (integer): ", (phase) => {
-      rl.question("Enter temperature (in Celsius): ", (temperature) => {
+readUserValue.question("Enter distance (in millimeters): ", (distance) => {
+  readUserValue.question("Enter magnitude (unsigned integer): ", (magnitude) => {
+    readUserValue.question("Enter phase (integer): ", (phase) => {
+      readUserValue.question("Enter temperature (in Celsius): ", (temperature) => {
         // Create the telegram message with user input
         const telegramMessage = createTelegram(
           parseInt(distance),
@@ -49,14 +49,14 @@ rl.question("Enter distance (in millimeters): ", (distance) => {
           () => {
             console.log("Connected to server!");
             client.write(telegramMessage);
-            rl.close(); // Close the readline interface
+            readUserValue.close(); // Close the readline interface
           }
         );
 
         // Handle errors
         client.on("error", (err) => {
           console.error("Error:", err);
-          rl.close(); // Close the readline interface
+          readUserValue.close(); // Close the readline interface
         });
 
         // Handle closure
