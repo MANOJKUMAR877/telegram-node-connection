@@ -9,7 +9,7 @@ const server = net.createServer((socket) => {
     console.log("Received telegram message:", data);
     // Parse telegram message
     const identifier = data.slice(0, 3).toString("utf-8");
-    const distance = data.readBigInt64BE(3);
+    const distance = Number(data.readBigInt64BE(3));
     const magnitude = data.readUInt32BE(11);
     const phase = data.readInt8(15);
     const temperature = data.readInt32LE(16);
