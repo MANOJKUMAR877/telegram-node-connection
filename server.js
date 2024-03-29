@@ -15,11 +15,22 @@ const server = net.createServer((socket) => {
     const temperature = data.readInt32LE(16);
 
     // Display parsed data
-    console.log("Identifier:", identifier);
-    console.log("Distance:", distance);
-    console.log("Magnitude:", magnitude);
-    console.log("Phase:", phase);
-    console.log("Temperature:", temperature);
+    // console.log("Identifier:", identifier);
+    // console.log("Distance:", distance);
+    // console.log("Magnitude:", magnitude);
+    // console.log("Phase:", phase);
+    // console.log("Temperature:", temperature);
+    const value = [
+      {
+        Identifier: identifier.toString(),
+        Distance: distance,
+        Magnitude: magnitude,
+        Phase: phase,
+        Temperature: temperature,
+      },
+    ];
+   
+    console.table(value);
   });
 
   // Handle closure

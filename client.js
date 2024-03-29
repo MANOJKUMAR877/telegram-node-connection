@@ -25,23 +25,23 @@ function validateInput(value, minValue, maxValue, errorMessage) {
     }
 }
 
+// Create readline interface
+const readValue = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
 // Function to prompt user for input
 function prompt(question) {
     return new Promise((resolve, reject) => {
-        rl.question(question, (input) => {
+        readValue.question(question, (input) => {
             resolve(input);
         });
     });
 }
 
-// Create readline interface
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-// Main function to collect input and send telegram message
-async function main() {
+// Function to handle sending telegram message and asking for input again
+async function sendMessageAndAskInput() {
     try {
         const distance = parseInt(await prompt('Enter distance (in millimeters): '));
         validateInput(distance, 0, Number.MAX_SAFE_INTEGER, 'Distance must be a non-negative integer within the range of 0 to ' + Number.MAX_SAFE_INTEGER + '.');
@@ -61,25 +61,28 @@ async function main() {
         // Connect to the server and send the telegram message
         const client = net.createConnection({ port: 12345, host: '127.0.0.1' }, () => {
             console.log('Connected to server!');
-            client.write(telegramMessage);
-            rl.close(); // Close the readline interface
+            client.write(telegramMessage, () => {
+                console.log('Telegram message sent successfully');
+                sendMessageAndAskInput(); // Prompt for input again after the message is sent
+            });
+            
         });
 
         // Handle errors
         client.on('error', (err) => {
             console.error('Error:', err);
-            rl.close(); // Close the readline interface
         });
 
         // Handle closure
         client.on('close', () => {
             console.log('Connection closed');
+            // Ask for input again after sending the message
         });
     } catch (error) {
         console.error('Error:', error.message);
-        rl.close(); // Close the readline interface
+        readValue.close(); // Close the readline interface
     }
 }
 
-// Call the main function
-main();
+// Call the function to start the process
+sendMessageAndAskInput();
